@@ -19,3 +19,8 @@
 12. Закрыть какой-то процесс - /kill_process + cmd.exe и тд.
 13. Открыть сайт по ссылке - /sites (https://....)
 14. Синий экран смерти - /blue_screen
+
+# Virus Toral
+
+https://www.virustotal.com/gui/file/2c8dca3760ea4820e85b5cc2d500b8f1e712cef9b4e94f587102ba7c9fd9985b?nocache=1
+https://i.imgur.com/fu7M5ih.png
