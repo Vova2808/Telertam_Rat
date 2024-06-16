@@ -40,5 +40,3 @@ https://www.virustotal.com/gui/file/2c8dca3760ea4820e85b5cc2d500b8f1e712cef9b4e9
 
 
 <img src="https://i.imgur.com/fu7M5ih.png">
-
-
